@@ -1,3 +1,6 @@
+Refer yelp-journey-backend for backend code: https://github.com/prajithravisankar/yelp-journey-backend
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
