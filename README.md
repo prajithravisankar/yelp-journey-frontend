@@ -1,39 +1,53 @@
 Refer yelp-journey-backend for backend code: https://github.com/prajithravisankar/yelp-journey-backend
 
+```mermaid
+sequenceDiagram
+    title Signup Flow (POST /auth/signup)
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+    participant C as Client (Next.js / Postman)
+    participant R as Gin Router (/auth)
+    participant H as SignupHandler
+    participant D as DB (Postgres via GORM)
 
-## Getting Started
+    C->>R: POST /auth/signup\n{ email, password }
+    R->>H: route request
+    H->>H: Bind & validate JSON\n(SignupRequest)
+    H->>H: Hash password with bcrypt
+    H->>D: INSERT INTO users\n(email, password_hash)
+    D-->>H: Insert OK (new user ID)
+    H-->>C: 201 Created\n{ id, email }
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+    note over H,D: On duplicate email,\nhandler returns 409 Conflict\n{ "error": "email_already_exists" }
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```mermaid
+sequenceDiagram
+    title Login Flow (POST /auth/login)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+    participant C as Client (Next.js / Postman)
+    participant R as Gin Router (/auth)
+    participant H as LoginHandler
+    participant D as DB (Postgres via GORM)
 
-## Learn More
+    C->>R: POST /auth/login\n{ email, password }
+    R->>H: route request
+    H->>H: Bind & validate JSON\n(LoginRequest)
+    H->>D: SELECT * FROM users\nWHERE email = ?
+    D-->>H: User row or not found
 
-To learn more about Next.js, take a look at the following resources:
+    alt user found
+        H->>H: bcrypt.CompareHashAndPassword\n(stored_hash, password)
+        alt password matches
+            H-->>C: 200 OK\n{ id, email }
+        else password mismatch
+            H-->>C: 401 Unauthorized\n{ "error": "invalid_credentials" }
+        end
+    else user not found
+        H-->>C: 401 Unauthorized\n{ "error": "invalid_credentials" }
+    end
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
