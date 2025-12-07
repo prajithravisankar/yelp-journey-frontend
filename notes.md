@@ -56,3 +56,12 @@
     - By using layout.tsx, you can define common elements such as headers, footers, navigation menus, and other UI components that should be present on every page within that directory.
     - Not only UI but also you can wrap your application with providers like SessionProvider to manage global state or functionality.
     - This ensures that the session management is applied consistently across all pages and components within the application.
+
+- refer [page.tsx](app/signup/page.tsx) and [page.tsx](app/login/page.tsx)
+  - with this file we complete the signup/login page implementation.
+  - after signing up or logging in we go to the dashboard to show that authentication is successful. [page.tsx](app/dashboard/page.tsx)
+
+- testing authentication flow (signup -> login -> dashboard)
+  - ![img.png](img.png)
+  - ![img_1.png](img_1.png)
+  - ![img_2.png](img_2.png)
